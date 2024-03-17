@@ -1,11 +1,11 @@
 section     .data
 
-MainBuffer db 2048 DUP(0)
+MainBuffer  db 2048 DUP(0)
 
 JmpTable:   times '%' -  0      dq  EndOfFunc
                                 dq  PercSpec            ; спецификатор '%'.
 
-            times 'b' - '%' - 1 dq  EndOfFunc           ; случаи от '$' до 'a'.
+            times 'b' - '%' - 1 dq  EndOfFunc           ; case from '$' to 'a'.
                                 dq  BinSpec             ; спецификатор 'b' - двоичное число.
                                 dq  CharSpec            ; спецификатор 'c'.
                                 dq  DecSpec             ; спецификатор 'd'.
@@ -22,20 +22,20 @@ JmpTable:   times '%' -  0      dq  EndOfFunc
             times 255 - 'x' - 1 dq  EndOfFunc           ; не спецификаторы.
 
 
-RegTable:   dq FirstArg
-            dq SecondArg
-            dq ThirdArg
-            dq FourthArg
-            dq FifthArg
+RegTable:                       dq  FirstArg
+                                dq  SecondArg
+                                dq  ThirdArg
+                                dq  FourthArg
+                                dq  FifthArg
 
 
 section .text
 
-MainBuffSize        equ     2048
-MainBuffEndAddr     equ     MainBuffer + MainBuffSize - 1
-MaxItoaSize         equ     64
+MainBuffSize     equ     2048
+MainBuffEndAddr  equ     MainBuffer + MainBuffSize - 1
+MaxItoaSize      equ     64
 
-StackProloge        equ     24
+StackProloge     equ     24
 
 ;-------------------------------------------------------------------------------
 %macro  .ExchangeSyms 0
@@ -45,12 +45,12 @@ StackProloge        equ     24
 
 %endm
 ;-------------------------------------------------------------------------------
-%macro  .CheckBuffSize 2                            ; подумать над названием.
+%macro  .CheckBuffSize 2                                ; подумать над названием.
 
         cmp rbx, MainBuffEndAddr - %1
         jb %2
 
-        lea rbx, MainBuffer                         ; закольцевали буффер.
+        lea rbx, MainBuffer                             ; закольцевали буффер.
 %2:
 %endm
 ;-------------------------------------------------------------------------------
@@ -90,18 +90,19 @@ StackProloge        equ     24
         jmp TakeSyms
 
 %endm
+;-------------------------------------------------------------------------------
 global MyPrintf
 ;===============================================================================
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;первые 6 аргументов функции хранятся в регистрах RDI, RSI, RDX, RCX, R8, R9.
 ;RDI - начало форматной строки.
 ;:==============================================================================
-MyPrintf:   xor r15, r15                            ; счетчик аргуентов.
+MyPrintf:   xor r15, r15                                ; счетчик аргуентов.
 
-            lea rbx, MainBuffer                     ; положили в RBX адрес первого элемента буфера.
+            lea rbx, MainBuffer                         ; положили в RBX адрес первого элемента буфера.
             xor r14, r14
 
-TakeSyms:   cmp byte [rdi], 0                       ; \0 - конец строки.
+TakeSyms:   cmp byte [rdi], 0                           ; \0 - конец строки.
             je PrintStr
 
             cmp byte [rdi], '%'
@@ -120,8 +121,8 @@ TakeSyms:   cmp byte [rdi], 0                       ; \0 - конец строк
 
 SkipNewStr: dec rdi
 
-Writing:    .ExchangeSyms                           ; если не % то кладем в буфер символ из форматной строки и
-                                                    ; и проверяем новый символ.
+Writing:    .ExchangeSyms                               ; если не % то кладем в буфер символ из форматной строки и
+                                                        ; и проверяем новый символ.
             .Next CheckBuffEnd
 
 HandleSpec: call DoSpec
@@ -130,21 +131,21 @@ HandleSpec: call DoSpec
 ;===============================================================================
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;:==============================================================================
-PrintStr:   mov r10, rdx                ; сохраняем значение rdx
-            mov r13, rsi                ; сохраняем значение rsi
-            mov r12, rdi                ; сохраняем значение rdi
+PrintStr:   mov r10, rdx                                ; сохраняем значение rdx
+            mov r13, rsi                                ; сохраняем значение rsi
+            mov r12, rdi                                ; сохраняем значение rdi
 
 
-            lea rsi, MainBuffer         ; адрес начала буфера.
-            sub rbx, rsi                ; rbx - место конечного символа.
-            mov rdx, rbx                ; для запуска системного вызова кладем в rdx - число символов, которые
-                                        ; нужно распечатать.
+            lea rsi, MainBuffer                         ; адрес начала буфера.
+            sub rbx, rsi                                ; rbx - место конечного символа.
+            mov rdx, rbx                                ; для запуска системного вызова кладем в rdx - число символов,
+                                                        ; которые нужно распечатать.
             add rdx, 1
 
-            mov rbx, rcx                ; сохраняем значение rcx
+            mov rbx, rcx                                ; сохраняем значение rcx
 
             mov rdi, 1
-            mov rax, 1                  ; параметры для запуска функции.
+            mov rax, 1                                  ; параметры для запуска функции.
             syscall
 
             mov rdi, r12
@@ -152,7 +153,7 @@ PrintStr:   mov r10, rdx                ; сохраняем значение rd
             mov r10, rdx
             mov rcx, rbx
 
-            lea rbx, MainBuffer             ; вернули rbx на начало буфера.
+            lea rbx, MainBuffer                         ; вернули rbx на начало буфера.
 
             ret
 ;:==============================================================================
@@ -175,94 +176,94 @@ PercSpec:   xor rax, rax
 
             jmp EndOfFunc
 ;-------------------------------------------------------------------------------
-CharSpec:       xor rax, rax
-                call TakeArg                                 ; вызываем функцию.
+CharSpec:   xor rax, rax
+            call TakeArg                                ; вызываем функцию.
 
-                mov byte [rbx], al                          ; положили символ в буффер.
+            mov byte [rbx], al                          ; положили символ в буффер.
 
-                inc rbx
+            inc rbx
 
-                jmp EndOfFunc
+            jmp EndOfFunc
 ;-------------------------------------------------------------------------------
-StrSpec:        xor rax, rax
-                call TakeArg
+StrSpec:    xor rax, rax
+            call TakeArg
 
-                mov r12, rsi                                ; хранит старое значение rsi.
-                mov rsi, rax
+            mov r12, rsi                                ; хранит старое значение rsi.
+            mov rsi, rax
 
-MoveStr:        .CheckBuffSize 0, CheckBuffSizeInRemoving   ; проверяет хватает ли места в буфере.
-                cmp byte [rsi], 0
-                je EndMove
+MoveStr:    .CheckBuffSize 0, CheckBuffSizeInRemoving   ; проверяет хватает ли места в буфере.
+            cmp byte [rsi], 0
+            je EndMove
 
-                mov al, byte [rsi]                          ; переложили символ из строки в буфер.
-                mov byte [rbx], al
+            mov al, byte [rsi]                          ; переложили символ из строки в буфер.
+            mov byte [rbx], al
 
-                inc rbx
-                inc rsi
+            inc rbx
+            inc rsi
 
-                jmp MoveStr
+            jmp MoveStr
 
-                mov rsi, r12                                ; вернули в rsi старое значение.
+            mov rsi, r12                                ; вернули в rsi старое значение.
 
-EndMove:        jmp EndOfFunc
+EndMove:    jmp EndOfFunc
 ;-------------------------------------------------------------------------------
-DecSpec:        xor rax, rax
-                call TakeArg
+DecSpec:    xor rax, rax
+            call TakeArg
 
-                cmp eax, 0
-                jge ModOfInt
+            cmp eax, 0
+            jge ModOfInt
 
-                sub rax, 1
+            sub rax, 1
 
-                xor rax, -1                                      ; получили число по модулю.
+            xor rax, -1                                 ; получили число по модулю.
 
-                mov byte [rbx], '-'
-                inc rbx
+            mov byte [rbx], '-'
+            inc rbx
 
-ModOfInt:       call Itoa10
+ModOfInt:   call Itoa10
 
-                jmp EndOfFunc
+            jmp EndOfFunc
 ;-------------------------------------------------------------------------------
-BinSpec:        .2PowSpecs 1
+BinSpec:    .2PowSpecs 1
 ;-------------------------------------------------------------------------------
-OctSpec:        .2PowSpecs 3
+OctSpec:    .2PowSpecs 3
 ;-------------------------------------------------------------------------------
-HexSpec:        .2PowSpecs 4
+HexSpec:    .2PowSpecs 4
 ;-------------------------------------------------------------------------------
-EndOfFunc:      xor rax, rax
-                inc rdi
-                ret
+EndOfFunc:  xor rax, rax
+            inc rdi
+            ret
 ;===============================================================================
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;===============================================================================
-Itoa10:         .CheckBuffSize MaxItoaSize, CheckBuffSizeIn10
+Itoa10:     .CheckBuffSize MaxItoaSize, CheckBuffSizeIn10
 
-                mov r12, rsi
-                mov r13, rdx
+            mov r12, rsi
+            mov r13, rdx
 
-                xor rdx, rdx
-                mov rsi, rbx                                ; запоминает начальную позицию числа в буффере.
-                xor r10, r10
+            xor rdx, rdx
+            mov rsi, rbx                                ; запоминает начальную позицию числа в буффере.
+            xor r10, r10
 
-                mov r10b, 10
+            mov r10b, 10
 
-GetNumStr:      div r10d                                    ; поделили на 10 число из регистра rax.
+GetNumStr:  div r10d                                    ; поделили на 10 число из регистра rax.
 
-                add dl, '0'
+            add dl, '0'
 
-                mov byte [rbx], dl
-                inc rbx
+            mov byte [rbx], dl
+            inc rbx
 
-                xor rdx, rdx
-                cmp eax, 0
-                jne GetNumStr
+            xor rdx, rdx
+            cmp eax, 0
+            jne GetNumStr
 
-                call ReverseStr
+            call ReverseStr
 
-                mov rsi, r12
-                mov rdx, r13
+            mov rsi, r12
+            mov rdx, r13
 
-                ret
+            ret
 ;===============================================================================
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;===============================================================================
@@ -282,7 +283,7 @@ Itoa2Pow:       .CheckBuffSize MaxItoaSize, CheckBuffSizeIn2
 ConvToNum:      mov r11, rax
                 and r11, r10
 
-                add r11b, '0'                 ; либо '0', либо '1'.
+                add r11b, '0'                           ; либо '0', либо '1'.
 
                 .WriteSymAndRenewNum ConvToNum
 
@@ -311,7 +312,7 @@ Finish:         call ReverseStr
 ;===============================================================================
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;===============================================================================
-ReverseStr: mov r11, rbx                            ; запомнили rbx.
+ReverseStr: mov r11, rbx                                ; запомнили rbx.
             mov r14, rdx
 
             dec rbx
