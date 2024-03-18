@@ -174,7 +174,7 @@ JmpTable:   times '%' -  0      dq  EndOfFunc
             sub rax, 1
 
             xor rax, -1             ; Инверсия. В двоичной записи числа меняет все
-                                    ; нули на единицы.
+                                    ; нули на единицы и наоборот.
 
             mov byte [rbx], '-'
             inc rbx
