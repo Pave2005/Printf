@@ -5,7 +5,7 @@ MainBuffer  db 2048 DUP(0)
 JmpTable:   times '%' -  0      dq  EndOfFunc
                                 dq  PercSpec            ; спецификатор '%'.
 
-            times 'b' - '%' - 1 dq  EndOfFunc           ; case from '$' to 'a'.
+            times 'b' - '%' - 1 dq  EndOfFunc           ; случаи от '$' до 'a'.
                                 dq  BinSpec             ; спецификатор 'b' - двоичное число.
                                 dq  CharSpec            ; спецификатор 'c'.
                                 dq  DecSpec             ; спецификатор 'd'.
