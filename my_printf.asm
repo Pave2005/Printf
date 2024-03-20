@@ -31,11 +31,12 @@ RegTable:                       dq  FirstArg
 
 section .text
 
-MainBuffSize     equ     2048
-MainBuffEndAddr  equ     MainBuffer + MainBuffSize - 1
-MaxItoaSize      equ     64
+MainBuffSize                    equ     2048
+MainBuffEndAddr                 equ     MainBuffer + MainBuffSize - 1
+MaxItoaSize                     equ     64
+NumOfLastArgInReg               equ     4
 
-StackProloge     equ     16
+StackProloge                    equ     16
 
 ;-------------------------------------------------------------------------------
 %macro  .ExchangeSyms 0
@@ -332,7 +333,7 @@ Skip:       mov rdx, r14
 ;===============================================================================
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;===============================================================================
-TakeArg:    cmp r15, 4
+TakeArg:    cmp r15, NumOfLastArgInReg
             ja UseStack
 
             mov rax, qword [8 * r15 + RegTable]
@@ -355,7 +356,7 @@ FifthArg:   mov rax, r9
 
 UseStack:   mov rax, r15
 
-            sub rax, 4 + 1                              ; Get from the stack the correct value
+            sub rax, NumOfLastArgInReg + 1
 
             mov rax, [rsp + StackProloge + rax * 8]
 
