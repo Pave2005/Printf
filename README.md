@@ -21,7 +21,19 @@
 ![](test.jpg)
 
 ## Сборка программы в системе под управлением операционной системы Linux.
-
+```
+git clone https://github.com/Pave2005/Printf.git
+```
+```
+mkdir build
+cd build
+```
+Зайдите в склонированный репозиторий.
+```
+apt install gсс
+apt install nasm
+```
+Для того чтобы собрать проект заранее нужно установить nasm и gcc.
 ```
 nasm -f elf64 -l my_printf.lst my_printf.asm
 ```
